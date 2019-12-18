@@ -38,3 +38,5 @@ restaurantCategoryInfo = restaurantCategoryElement[0].text.encode('ascii','ignor
 print('Restaurant Description',restaurantDescription)
 print('Restaurant Price',restaurantPrice)
 print('Restaurant Category',restaurantCategoryInfo)
+
+driver.quit()
