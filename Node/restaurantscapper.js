@@ -25,6 +25,8 @@ async function getRestaurantData(restaurantName) {
             console.log(er);
         });
 
+        console.log('-------------------Restaurant Details-------------------' + '\n');
+
         // Grab the Description HTML element
         driver.wait(until.elementLocated(
             By.xpath('//*[@id="pane"]/div/div[1]/div/div/jsl/button/div/div[1]/div[1]')), timeout
@@ -71,38 +73,37 @@ async function getRestaurantData(restaurantName) {
 
         // Grab the Time HTML element
         driver.wait(until.elementLocated(
-            By.xpath('//*[@id="pane"]/div/div[1]/div/div/div[12]/div[1]/span[2]/span[2]')),
+            By.xpath('//*[@id="pane"]/div/div[1]/div/div/div[13]/div[1]')),
             timeout
         ).then(restroTimingElement => {
             // console.log(restroTimingElement);
-           
-                return restroTimingElement.getText().then((value) => {
-                    let timingData = value;
-                    if (timingData == '') {
-                        console.log('Timing : ', 'Not Available');
-                    } else {
-                        console.log('Timing : ', timingData);
-                    }
-                }).catch((textNotFound) => {
-                    console.log(textNotFound);
-                });
 
-        }).catch ((er) => {
-                    console.log('Time not found');
-    });
+            return restroTimingElement.getText().then((value) => {
+                let timingData = value;
+                if (timingData == '') {
+                    console.log('Timing : ', 'Not Available');
+                } else {
+                    console.log('Timing : ', timingData);
+                    console.log('Service Hours : ', (timingData.split(':')[1]).split(' ')[2] ? (timingData.split(':')[1]).split(' ')[2] : (timingData.split(':')[1]).split(' ')[1]);
+                }
+            }).catch((textNotFound) => {
+                console.log(textNotFound);
+            });
 
-    // -------- Verify Code --------
-
-    // console.log('Restaurant Final Details');
+        }).catch((er) => {
+            console.log('Time not found');
+        });
 
 
 
 
 
 
-} catch (ex) {
-    console.log('Exception Occured', ex);
-}
+
+
+    } catch (ex) {
+        console.log('Exception Occured', ex);
+    }
     // finally{
     //     await driver.quit();
     // }
