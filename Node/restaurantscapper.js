@@ -1,6 +1,21 @@
 const { Builder, By, Key, until } = require('selenium-webdriver');
+const dbConnection = require('./mongoconnector');
+//const restroModel = require('./restroModel');
+// const DataGrabber = require('./dataGrabber');
+// const dataGrabberObject = new DataGrabber();
+const XLSX = require('xlsx');
+const restroFilePath = 'Book1.xlsx';
+
 const timeout = 60 * 1000;
 
+//dataGrabberObject.getDataFromFile();
+
+const workBook = XLSX.readFile(restroFilePath);
+const sheetNames = workBook.SheetNames;
+console.log(sheetNames);
+
+var data = XLSX.utils.sheet_to_json(workBook.Sheets[sheetNames[0]]);
+console.log(data);
 
 async function getRestaurantData(restaurantName) {
     let driver = await new Builder().forBrowser('chrome').build();
@@ -94,12 +109,9 @@ async function getRestaurantData(restaurantName) {
             console.log('Time not found');
         });
 
+        driver.quit();
 
-
-
-
-
-
+    console.log('------------ END -------------');
 
     } catch (ex) {
         console.log('Exception Occured', ex);
@@ -109,4 +121,13 @@ async function getRestaurantData(restaurantName) {
     // }
 }
 
-getRestaurantData('burger king');
+for(i=0;i<data.length;i++){
+    console.log(data[i].Restaurant);
+    getRestaurantData(data[i].Restaurant);
+
+    setTimeout(function(){
+
+    }, 60*1000)
+
+}
+
