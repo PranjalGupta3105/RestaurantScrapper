@@ -19,11 +19,14 @@ console.log(data);
 
 async function getRestaurantData(restaurantName) {
     let driver = await new Builder().forBrowser('chrome').build();
-
     try {
+        console.log('----------------------------------------------');
+        console.log('Restaurant Name : ' + restaurantName);
 
         // Go to maps.google.com URL
         await driver.get('https://maps.google.com');
+
+        // https://www.google.com/maps/search/Chuy's/@28.6102497,77.3602831,16z/data=!3m1!4b1
 
         // Find the search input field and to the field fill the search param as Restaurant Name
         await driver.findElement(By.xpath('//*[@id="searchboxinput"]')).sendKeys(restaurantName);
@@ -39,16 +42,18 @@ async function getRestaurantData(restaurantName) {
         }).catch((er) => {
             console.log(er);
         });
-
-        console.log('-------------------Restaurant Details-------------------' + '\n');
-
+        console.log('-------------------Scrapped Restaurant Details-------------------' + '\n');
         // Grab the Description HTML element
         driver.wait(until.elementLocated(
             By.xpath('//*[@id="pane"]/div/div[1]/div/div/jsl/button/div/div[1]/div[1]')), timeout
         ).then(descriptionElement => {
             return descriptionElement.getText().then((value) => {
                 let descriptionData = value;
-                console.log('Description : ', descriptionData);
+                if (value == '') {
+                    console.log('Description : ', 'No Description Available');
+                } else {
+                    console.log('Description : ', descriptionData);
+                }
             }).catch((textNotFound) => {
                 console.log(textNotFound);
             });
@@ -63,12 +68,16 @@ async function getRestaurantData(restaurantName) {
         ).then(priceElement => {
             return priceElement.getText().then((value) => {
                 let priceData = value;
-                console.log('Price : ', priceData);
+                if (value == '') {
+                    console.log('Price : ', 'Not Available');
+                } else {
+                    console.log('Price : ', priceData);
+                }
             }).catch((textNotFound) => {
-                console.log(textNotFound);
+                console.log('Price : ', 'Not Available');
             });
         }).catch((er) => {
-            console.log(er);
+            console.log('Price : ', 'Not Available');
         });
 
         // Grab the Category HTML element
@@ -88,46 +97,64 @@ async function getRestaurantData(restaurantName) {
 
         // Grab the Time HTML element
         driver.wait(until.elementLocated(
-            By.xpath('//*[@id="pane"]/div/div[1]/div/div/div[13]/div[1]')),
+            By.xpath('/html/body/jsl/div[3]/div[9]/div[9]/div/div[1]/div/div/div[12]/div[1]/span[1]/img')),
+            // //*[@id="pane"]/div/div[1]/div/div/div[13]/div[1]
+            // /html/body/jsl/div[3]/div[9]/div[9]/div/div[1]/div/div/div[12]/div[1]/span[2]/span[2]
             timeout
-        ).then(restroTimingElement => {
-            // console.log(restroTimingElement);
-
-            return restroTimingElement.getText().then((value) => {
-                let timingData = value;
-                if (timingData == '') {
-                    console.log('Timing : ', 'Not Available');
-                } else {
-                    console.log('Timing : ', timingData);
-                    console.log('Service Hours : ', (timingData.split(':')[1]).split(' ')[2] ? (timingData.split(':')[1]).split(' ')[2] : (timingData.split(':')[1]).split(' ')[1]);
-                }
-            }).catch((textNotFound) => {
-                console.log(textNotFound);
-            });
-
+        ).then(restroClockElement => {
+            if (restroClockElement != '') {
+                driver.wait(until.elementLocated(
+                    By.xpath('/html/body/jsl/div[3]/div[9]/div[9]/div/div[1]/div/div/div[12]/div[1]/span[2]')),
+                    // //*[@id="pane"]/div/div[1]/div/div/div[13]/div[1]
+                    // /html/body/jsl/div[3]/div[9]/div[9]/div/div[1]/div/div/div[12]/div[1]/span[2]/span[2]
+                    timeout
+                ).then(restroTimingElement => {
+                    return restroTimingElement.getText().then((value) => {
+                        let timingData = value;
+                        if (timingData == '') {
+                            console.log('Timing : ', 'Not Available');
+                        } else {
+                            if (timingData.includes("am") || timingData.includes("pm")) {
+                                console.log('Timing : ', timingData);
+                            } else {
+                                console.log('Timing : ', 'Not Available');
+                            }
+                        }
+                    }).catch((textNotFound) => {
+                        console.log('Timing : ', 'Not Available');
+                    });
+                }).catch((er) => {
+                    console.log('Time not found');
+                });
+            } else {
+                console.log('Timing : ', 'Not Available');
+            }
         }).catch((er) => {
-            console.log('Time not found');
+            console.log('Timing : ', 'Not Available');
         });
 
+        await sleep(60 * 1 * 1000)
         driver.quit();
-
-    console.log('------------ END -------------');
-
     } catch (ex) {
         console.log('Exception Occured', ex);
     }
-    // finally{
-    //     await driver.quit();
-    // }
 }
 
-for(i=0;i<data.length;i++){
-    console.log(data[i].Restaurant);
-    getRestaurantData(data[i].Restaurant);
-
-    setTimeout(function(){
-
-    }, 60*1000)
-
+function sleep(ms) {
+    return new Promise(resolve => {
+        setTimeout(resolve, ms)
+    })
 }
 
+async function callOperation() {
+    // Initializing Restaurant Scrapping Process
+    console.log('\n' + 'Initializing Scrapping...' + '\n');
+    for (i = 0; i < data.length; i++) {
+        // console.log(data[i].Restaurant);
+        await getRestaurantData(data[i].Restaurant);
+        await sleep(60 * 0.5 * 1000);
+    }
+    console.log('------------ Scrapping END -------------');
+}
+
+callOperation()
