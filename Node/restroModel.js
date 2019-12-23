@@ -2,22 +2,36 @@ const mongoose =  require('mongoose');
 const Schema = mongoose.Schema;
 
 const RestroSchema = new Schema({
-    restaurant_name: {
-        type: String,
-        required: true
-    },
-    restro_description:{
-        type: String,
-        required: true
-    },
-    restro_category:{
+    brand_id:{
         type: String
     },
-    restro_timing:{
+    website:{
+        type: String
+    },
+    name: {
+        type: String,
+    },
+    type:{
+        type: Number
+    },
+    item_count:{
+        type: Number
+    },
+    updated_at:{
+        type: Date
+    },
+    description:{
+        type: String,
+        required: true
+    },
+    category:{
+        type: String
+    },
+    timing:{
         type: String
     }
 })
 
-const RestroModel = mongoose.Model('restaurants', RestroSchema);
+const RestroModel = mongoose.model('restaurants', RestroSchema);
 module.exports = RestroModel;
 

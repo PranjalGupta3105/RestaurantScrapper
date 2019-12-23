@@ -1,6 +1,6 @@
 const { Builder, By, Key, until } = require('selenium-webdriver');
 const dbConnection = require('./mongoconnector');
-//const restroModel = require('./restroModel');
+const restroModel = require('./restroModel');
 // const DataGrabber = require('./dataGrabber');
 // const dataGrabberObject = new DataGrabber();
 const XLSX = require('xlsx');
@@ -146,14 +146,37 @@ function sleep(ms) {
     })
 }
 
+async function getRestaurantsFromDB(){
+    restroModel.find({},{name: 1,_id: 0},(err, restroResult)=>{
+        if(err){
+            console.log(err);
+        }else{
+            console.log('Restaurants details Datatype :'+typeof(restroResult));
+            //console.log(restroResult);
+            
+            return restroResult;
+        }
+    })
+}
+
+
 async function callOperation() {
     // Initializing Restaurant Scrapping Process
-    console.log('\n' + 'Initializing Scrapping...' + '\n');
-    for (i = 0; i < data.length; i++) {
-        // console.log(data[i].Restaurant);
-        await getRestaurantData(data[i].Restaurant);
-        await sleep(60 * 0.5 * 1000);
-    }
+    // console.log('\n' + 'Initializing Scrapping...' + '\n');
+    // for (i = 0; i < data.length; i++) {
+    //     // console.log(data[i].Restaurant);
+    //     await getRestaurantData(data[i].Restaurant);
+    //     await sleep(60 * 0.5 * 1000);
+    // }
+
+    await getRestaurantsFromDB().then((restaurantslis)=>{
+        console.log(restaurantslis);
+        
+    }).catch((err)=>{
+        console.log(err);
+        
+    })
+    
     console.log('------------ Scrapping END -------------');
 }
 

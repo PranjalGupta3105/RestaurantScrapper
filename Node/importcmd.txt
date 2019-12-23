@@ -1,0 +1,1 @@
+mongoimport -d <database_name> -c <collection_name> --type CSV --file <csv_file>.csv --headerline
