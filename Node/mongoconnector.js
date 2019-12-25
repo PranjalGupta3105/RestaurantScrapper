@@ -1,4 +1,4 @@
 const mongoose = require('mongoose');
-const dburl = 'mongodb://localhost:27017/lcl_local';
+const dburl = '';
 
 mongoose.connect(dburl, {useNewUrlParser: true});

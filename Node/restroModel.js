@@ -24,6 +24,9 @@ const RestroSchema = new Schema({
         type: String,
         required: true
     },
+    pricing:{
+        type: String
+    },
     category:{
         type: String
     },
@@ -34,4 +37,3 @@ const RestroSchema = new Schema({
 
 const RestroModel = mongoose.model('restaurants', RestroSchema);
 module.exports = RestroModel;
-
